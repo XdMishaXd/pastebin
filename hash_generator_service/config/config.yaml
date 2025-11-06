@@ -1,11 +1,12 @@
 env: "local"
 
 kafka:
-  host: "localhost"
-  port: "9092"
+  addr: "localhost:9092"
   topic: "hash_queue"
+  batch_size: 1
+  max_attempts: 3
   
 hash:
   hash_rate: 100
   hash_length: 8
-  batch_size: 1
+  workers: 1

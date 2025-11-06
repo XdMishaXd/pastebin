@@ -8,19 +8,22 @@ import (
 )
 
 type Config struct {
-	Env string `yaml:"env" env-default:"local"`
+	Env   string `yaml:"env" env-default:"local"`
+	Kafka `yaml:"kafka"`
+	Hash  `yaml:"hash"`
 }
 
 type Kafka struct {
-	Host  string `yaml:"host" env-default:"localhost"`
-	Port  int    `yaml:"post" env-default:"9092"`
-	Topic string `yaml:"topic" env-required:"true"`
+	Addr        string `yaml:"addr" env-default:"localhost:9092"`
+	Topic       string `yaml:"topic" env-required:"true"`
+	BatchSize   int    `yaml:"batch_size" env-default:"1"`
+	MaxAttempts int    `yaml:"max_attempts" env-default:"3"`
 }
 
 type Hash struct {
 	HashRate   int `yaml:"hash_rate" env-required:"true"`
 	HashLength int `yaml:"hash_length" env-required:"true"`
-	BatchSize  int `yaml:"batch_size" env-default:"1"`
+	Workers    int `yaml:"workers" env-default:"1"`
 }
 
 func MustLoad() *Config {
