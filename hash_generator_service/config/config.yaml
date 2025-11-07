@@ -1,12 +1,12 @@
-env: "local"
+env: "dev"
 
 kafka:
-  addr: "localhost:9092"
+  addr: "kafka:9092"
   topic: "hash_queue"
   batch_size: 1
   max_attempts: 3
   
 hash:
-  hash_rate: 100
+  hash_rate: 1
   hash_length: 8
   workers: 1

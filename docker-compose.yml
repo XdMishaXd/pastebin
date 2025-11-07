@@ -1,0 +1,41 @@
+services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_OPTS: "-Dkafka.logs.dir=/var/lib/kafka/data -Dlog4j.configuration=file:/opt/kafka/config/log4j.properties"
+      KAFKA_TOPIC: "hash_queue"
+    command: >
+      bash -c "if [ ! -f /var/lib/kafka/data/meta.properties ]; then
+        echo 'Formatting storage directory...';
+        /opt/kafka/bin/kafka-storage.sh format --ignore-formatted --config /opt/kafka/config/server.properties --cluster-id Xw--cSYEQuuf8fTfWEYCQg;
+      fi &&
+      /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties"
+    volumes:
+      - ./server.properties:/opt/kafka/config/server.properties
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:9092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  hash_gen_service:
+    build:
+      context: ./hash_generator_service
+      dockerfile: Dockerfile
+    container_name: hash_generator_service
+    restart: always
+    depends_on:
+      kafka: 
+        condition: service_healthy
+    volumes:
+      - ./hash_generator_service/config:/app/config
+
+volumes:
+  kafka_data:
