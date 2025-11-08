@@ -1,0 +1,21 @@
+env: "local"
+
+http_server:
+  address: "0.0.0.0:8082"
+  timeout: 4s
+  idle_timeout: 30s
+
+kafka:
+  addr: "kafka:9092"
+  topic: "hash_queue"
+  groupid: "1"
+
+mysql:
+  user: "pasteuser"
+  password: "pastepass"
+  dbname: "pastebin"
+
+minio:
+  user: "minioadmin"
+  password: "minioadmin"
+  bucket: ""

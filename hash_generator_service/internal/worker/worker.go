@@ -27,6 +27,7 @@ func New(id, hashLen, rate, batchSize int, producer *kafkaWriter.KafkaWriter) *W
 	}
 }
 
+// * Run запускает worker
 func (w *Worker) Run(ctx context.Context, log *slog.Logger) {
 	gen := hashgen.New(w.ID, w.HashLength)
 

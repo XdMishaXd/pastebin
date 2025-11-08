@@ -11,6 +11,7 @@ type HashGenerator struct {
 	hashLen int
 }
 
+// * New - конструктор для HashGenerator
 func New(workerID int, hashLen int) *HashGenerator {
 	return &HashGenerator{
 		id:      workerID,
@@ -18,6 +19,7 @@ func New(workerID int, hashLen int) *HashGenerator {
 	}
 }
 
+// * Generate генерирует хэш с длинной hashLen
 func (g *HashGenerator) Generate(hashLen int) (string, error) {
 	data := make([]byte, hashLen)
 	_, err := rand.Read(data)

@@ -24,7 +24,6 @@ services:
       timeout: 5s
       retries: 6
       start_period: 20s
-
   hash_gen_service:
     build:
       context: ./hash_generator_service
@@ -36,6 +35,31 @@ services:
         condition: service_healthy
     volumes:
       - ./hash_generator_service/config:/app/config
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pastebin
+      MYSQL_USER: pasteuser
+      MYSQL_PASSWORD: pastepass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Web-консоль
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
 
 volumes:
   kafka_data:

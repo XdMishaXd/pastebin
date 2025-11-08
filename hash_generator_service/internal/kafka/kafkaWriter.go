@@ -27,6 +27,7 @@ func New(addr, topic string, batchSize, maxAttemps int) *KafkaWriter {
 	}
 }
 
+// * SendMessages отправляет []string messages от вокркера workerID
 func (p *KafkaWriter) SendMessages(ctx context.Context, workerID int, messages []string) error {
 	const op = "kafka.SendMessages"
 
