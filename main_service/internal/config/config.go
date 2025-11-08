@@ -26,6 +26,7 @@ type MinIO struct {
 	User     string `yaml:"user" env-required:"true"`
 	Password string `yaml:"password" env-required:"true"`
 	Bucket   string `yaml:"bucket" env-required:"true"`
+	UseSSL   bool   `yaml:"useSSL" env-default:"false"`
 }
 
 type MySQL struct {

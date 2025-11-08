@@ -19,3 +19,4 @@ minio:
   user: "minioadmin"
   password: "minioadmin"
   bucket: ""
+  useSSL: false
