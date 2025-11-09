@@ -1,5 +1,7 @@
 env: "local"
 
+default_ttl: 1
+
 http_server:
   address: "0.0.0.0:8082"
   timeout: 4s

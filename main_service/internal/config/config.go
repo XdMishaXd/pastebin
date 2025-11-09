@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	Env        string `yaml:"env" env-default:"local"`
+	DefaultTTL int    `yaml:"default_ttl" env-default:"1"`
 	HTTPServer `yaml:"http_server"`
 	MySQL      `yaml:"mysql"`
 	Kafka      `yaml:"kafka"`
