@@ -1,9 +1,11 @@
 package save
 
 import (
+	"context"
 	"log/slog"
 	resp "main_service/internal/lib/api/response"
 	sl "main_service/internal/lib/logger"
+	"main_service/internal/models"
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
@@ -21,11 +23,7 @@ type Response struct {
 	Hash string `json:"hash"`
 }
 
-type TextSaver interface {
-	SaveText(text string, ttl int) (string, error)
-}
-
-func New(log *slog.Logger, textSaver TextSaver, defaultTTL int) http.HandlerFunc {
+func New(log *slog.Logger, ctx context.Context, textSaver models.TextSaver, defaultTTL int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.text.save.New"
 
@@ -62,7 +60,7 @@ func New(log *slog.Logger, textSaver TextSaver, defaultTTL int) http.HandlerFunc
 			timeToLive = defaultTTL
 		}
 
-		hash, err := textSaver.SaveText(req.Text, timeToLive)
+		hash, err := textSaver.SaveText(ctx, req.Text, timeToLive)
 		if err != nil {
 			log.Error("failed to save text", sl.Err(err))
 

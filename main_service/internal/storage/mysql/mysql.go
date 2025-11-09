@@ -4,14 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"main_service/internal/models"
+	"main_service/internal/storage"
 	"time"
 )
-
-type Paste struct {
-	Hash      string
-	CreatedAt time.Time
-	ExpiresAt time.Time
-}
 
 type Repository struct {
 	db *sql.DB
@@ -33,11 +29,12 @@ func New(dsn string) (*Repository, error) {
 }
 
 // * SaveMetadata сохраняет метаданные для текста
-func (r *Repository) SaveMetadata(ctx context.Context, hash string, ttl time.Duration) error {
+// * ttlDays — время жизни записи в днях
+func (r *Repository) SaveMetadata(ctx context.Context, hash string, ttlDays int) error {
 	const op = "mysql.SaveMetadata"
 
 	now := time.Now().UTC()
-	expires := now.Add(ttl)
+	expires := now.AddDate(0, 0, ttlDays)
 
 	query := `INSERT INTO pastes (hash, created_at, expires_at) VALUES (?, ?, ?)`
 
@@ -49,17 +46,21 @@ func (r *Repository) SaveMetadata(ctx context.Context, hash string, ttl time.Dur
 }
 
 // * GetByHash возвращает метаданные для текста по хэшу
-func (r *Repository) GetByHash(ctx context.Context, hash string) (*Paste, error) {
+func (r *Repository) GetByHash(ctx context.Context, hash string) (*models.Paste, error) {
 	const op = "mysql.GetByHash"
 
 	query := `SELECT hash, created_at, expires_at FROM pastes WHERE hash = ?`
 
-	var p Paste
+	var p models.Paste
 	if err := r.db.QueryRowContext(ctx, query, hash).Scan(&p.Hash, &p.CreatedAt, &p.ExpiresAt); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, storage.ErrTextNotFound
 		}
 		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if !p.ExpiresAt.IsZero() && p.ExpiresAt.Before(time.Now().UTC()) {
+		return nil, storage.ErrTTLIsExpired
 	}
 
 	return &p, nil
