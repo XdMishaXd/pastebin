@@ -13,12 +13,11 @@ kafka:
   groupid: "1"
 
 mysql:
-  user: "pasteuser"
-  password: "pastepass"
-  dbname: "pastebin"
+  dsn: "pasteuser:pastepass@tcp(mysql:3306)/pastebin?parseTime=true"
 
 minio:
+  endpoint: "localhost:9000"
   user: "minioadmin"
   password: "minioadmin"
-  bucket: ""
+  bucket: "pastes"
   useSSL: false

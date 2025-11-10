@@ -15,7 +15,7 @@ type MinIOStorage struct {
 	bucket string
 }
 
-func New(endpoint, accessKey, secretKey, bucket string, ctx context.Context, useSSL bool) (*MinIOStorage, error) {
+func New(ctx context.Context, endpoint, accessKey, secretKey, bucket string, useSSL bool) (*MinIOStorage, error) {
 	const op = "minio.New"
 
 	minioClient, err := minio.New(endpoint, &minio.Options{

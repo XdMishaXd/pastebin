@@ -23,7 +23,7 @@ type Response struct {
 	Hash string `json:"hash"`
 }
 
-func New(log *slog.Logger, ctx context.Context, textSaver models.TextSaver, defaultTTL int) http.HandlerFunc {
+func New(log *slog.Logger, ctx context.Context, textSaver models.TextOperator, defaultTTL int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.text.save.New"
 

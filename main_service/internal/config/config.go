@@ -24,6 +24,7 @@ type HTTPServer struct {
 }
 
 type MinIO struct {
+	Endpoint string `yaml:"endpoint" env-default:"localhost:9000"`
 	User     string `yaml:"user" env-required:"true"`
 	Password string `yaml:"password" env-required:"true"`
 	Bucket   string `yaml:"bucket" env-required:"true"`
@@ -31,9 +32,7 @@ type MinIO struct {
 }
 
 type MySQL struct {
-	User     string `yaml:"user" env-required:"true"`
-	Password string `yaml:"password" env-required:"true"`
-	DbName   string `yaml:"dbname" env-required:"true"`
+	DSN string `yaml:"dsn" env-required:"true"`
 }
 
 type Kafka struct {
