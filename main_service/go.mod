@@ -6,12 +6,14 @@ require (
 	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/render v1.0.3
 	github.com/go-playground/validator/v10 v10.28.0
+	github.com/go-sql-driver/mysql v1.9.3
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/minio/minio-go/v7 v7.0.97
 	github.com/segmentio/kafka-go v0.4.49
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

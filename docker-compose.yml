@@ -48,6 +48,12 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s     
+      timeout: 5s     
+      retries: 5          
+      start_period: 20s   
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -60,6 +66,33 @@ services:
       - MINIO_ROOT_PASSWORD=minioadmin
     volumes:
       - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+  main_service:
+    build:
+      context: ./main_service
+      dockerfile: Dockerfile
+    container_name: main_service
+    restart: always
+    ports:
+      - "8082:8082"
+    depends_on:
+      kafka: 
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      hash_gen_service:
+        condition: service_started
+    volumes:
+      - ./main_service/config:/app/config
 
 volumes:
   kafka_data:
+  mysql_data:
+  minio_data:

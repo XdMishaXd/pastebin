@@ -10,13 +10,13 @@ http_server:
 kafka:
   addr: "kafka:9092"
   topic: "hash_queue"
-  groupid: "1"
+  groupid: "sjh12iuhodqkgfj158"
 
 mysql:
   dsn: "pasteuser:pastepass@tcp(mysql:3306)/pastebin?parseTime=true"
 
 minio:
-  endpoint: "localhost:9000"
+  endpoint: "minio:9000"
   user: "minioadmin"
   password: "minioadmin"
   bucket: "pastes"

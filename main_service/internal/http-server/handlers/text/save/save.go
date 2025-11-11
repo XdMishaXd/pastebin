@@ -43,7 +43,7 @@ func New(log *slog.Logger, ctx context.Context, textSaver models.TextOperator, d
 			return
 		}
 
-		log.Info("Request body decoded", slog.Any("request", req))
+		log.Info("Request body decoded")
 
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
@@ -64,7 +64,7 @@ func New(log *slog.Logger, ctx context.Context, textSaver models.TextOperator, d
 		if err != nil {
 			log.Error("failed to save text", sl.Err(err))
 
-			render.JSON(w, r, resp.Error("Failed to save text"))
+			render.JSON(w, r, resp.Error("Internal error"))
 
 			return
 		}

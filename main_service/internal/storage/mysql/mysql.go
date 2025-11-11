@@ -7,6 +7,8 @@ import (
 	"main_service/internal/models"
 	"main_service/internal/storage"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Repository struct {
