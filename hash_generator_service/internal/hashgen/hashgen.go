@@ -2,7 +2,8 @@ package hashgen
 
 import (
 	"crypto/rand"
-	"encoding/base64"
+	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 )
 
@@ -28,5 +29,10 @@ func (g *HashGenerator) Generate(hashLen int) (string, error) {
 		return "", fmt.Errorf("failed to generate random bytes: %w", err)
 	}
 
-	return base64.StdEncoding.EncodeToString(data), nil
+	hash := sha512.Sum512(data)
+
+	hexHash := hex.EncodeToString(hash[:])
+	hexHash = hexHash[:hashLen]
+
+	return hexHash, nil
 }

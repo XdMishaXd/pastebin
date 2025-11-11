@@ -56,7 +56,10 @@ func (w *Worker) Run(ctx context.Context, log *slog.Logger) {
 				if err != nil {
 					log.Error("worker %d: failed to send messages: %v", slog.Int("id", w.ID), sl.Err(err))
 				} else {
-					log.Info("worker: sent messages", slog.Int("id", w.ID), slog.Int("amount", len(messages)))
+					log.Info("worker: sent messages",
+						slog.Int("id", w.ID),
+						slog.Int("amount", len(messages)),
+					)
 				}
 				messages = messages[:0]
 			}
