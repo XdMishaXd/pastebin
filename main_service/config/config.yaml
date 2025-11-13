@@ -9,8 +9,7 @@ http_server:
 
 kafka:
   addr: "kafka:9092"
-  topic: "hash_queue"
-  groupid: "sjh12iuhodqkgfj158"
+  topic: "hashQueue"
 
 mysql:
   dsn: "pasteuser:pastepass@tcp(mysql:3306)/pastebin?parseTime=true"

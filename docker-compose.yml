@@ -8,7 +8,6 @@ services:
       - "9093:9093"
     environment:
       KAFKA_OPTS: "-Dkafka.logs.dir=/var/lib/kafka/data -Dlog4j.configuration=file:/opt/kafka/config/log4j.properties"
-      KAFKA_TOPIC: "hash_queue"
     command: >
       bash -c "if [ ! -f /var/lib/kafka/data/meta.properties ]; then
         echo 'Formatting storage directory...';

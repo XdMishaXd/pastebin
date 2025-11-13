@@ -2,11 +2,11 @@ env: "dev"
 
 kafka:
   addr: "kafka:9092"
-  topic: "hash_queue"
-  batch_size: 1
+  topic: "hashQueue"
+  batch_size: 10
   max_attempts: 3
   
 hash:
-  hash_rate: 1
-  hash_length: 8
-  workers: 1
+  hash_rate: 100
+  hash_length: 7 # max length - 128 symbols
+  workers: 10

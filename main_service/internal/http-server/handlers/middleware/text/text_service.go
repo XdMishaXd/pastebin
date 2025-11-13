@@ -50,7 +50,7 @@ func (s *TextSaverService) SaveText(ctx context.Context, text string, ttl int) (
 		return "", err
 	}
 
-	return "", s.mysql.SaveMetadata(ctx, hash, ttl)
+	return hash, s.mysql.SaveMetadata(ctx, hash, ttl)
 }
 
 func (s *TextSaverService) GetText(ctx context.Context, hash string) (string, error) {

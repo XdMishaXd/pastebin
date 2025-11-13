@@ -64,7 +64,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	reader := kafkaReader.New(cfg.Kafka.Addr, cfg.Kafka.Topic, cfg.Kafka.GroupID)
+	reader := kafkaReader.New(cfg.Kafka.Addr, cfg.Kafka.Topic)
 
 	textService := textService.New(db, reader, blobStorage)
 

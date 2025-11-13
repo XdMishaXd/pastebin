@@ -36,9 +36,8 @@ type MySQL struct {
 }
 
 type Kafka struct {
-	Addr    string `yaml:"addr" env-default:"kafka:9092"`
-	Topic   string `yaml:"topic" env-required:"true"`
-	GroupID string `yaml:"groupid" env-default:"1"`
+	Addr  string `yaml:"addr" env-default:"kafka:9092"`
+	Topic string `yaml:"topic" env-required:"true"`
 }
 
 func MustLoad(configPath string) *Config {
