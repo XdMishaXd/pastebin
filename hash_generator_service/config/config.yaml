@@ -1,12 +1,12 @@
-env: "dev"
+env: "prod"
 
 kafka:
   addr: "kafka:9092"
   topic: "hashQueue"
-  batch_size: 10
+  batch_size: 15
   max_attempts: 3
   
 hash:
-  hash_rate: 100
+  hash_rate: 150
   hash_length: 7 # max length - 128 symbols
   workers: 10

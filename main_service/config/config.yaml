@@ -1,4 +1,4 @@
-env: "local"
+env: "prod"
 
 default_ttl: 1
 

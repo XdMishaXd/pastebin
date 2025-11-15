@@ -23,17 +23,6 @@ services:
       timeout: 5s
       retries: 6
       start_period: 20s
-  hash_gen_service:
-    build:
-      context: ./hash_generator_service
-      dockerfile: Dockerfile
-    container_name: hash_generator_service
-    restart: always
-    depends_on:
-      kafka: 
-        condition: service_healthy
-    volumes:
-      - ./hash_generator_service/config:/app/config
   mysql:
     image: mysql:latest
     container_name: mysql
@@ -71,6 +60,17 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+  hash_gen_service:
+    build:
+      context: ./hash_generator_service
+      dockerfile: Dockerfile
+    container_name: hash_generator_service
+    restart: always
+    depends_on:
+      kafka: 
+        condition: service_healthy
+    volumes:
+      - ./hash_generator_service/config:/app/config
   main_service:
     build:
       context: ./main_service
