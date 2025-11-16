@@ -18,7 +18,7 @@ type Response struct {
 	Text string `json:"text"`
 }
 
-func New(log *slog.Logger, ctx context.Context, textGetter models.TextOperator) http.HandlerFunc {
+func New(ctx context.Context, log *slog.Logger, textGetter models.TextOperator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.text.get.New"
 

@@ -70,18 +70,13 @@ func main() {
 		log.Error("failed to connect redis", slog.String("err", err.Error()))
 		os.Exit(1)
 	}
+	defer cache.Close()
 
 	reader := kafkaReader.New(cfg.Kafka.Addr, cfg.Kafka.Topic)
 
 	textService := textService.New(db, reader, blobStorage, cache, cfg.Redis.PopularityThreshold)
 
-	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-
-	r.Post("/save", save.New(log, ctx, textService, cfg.DefaultTTL))
-	r.Get("/{hash}", get.New(log, ctx, textService))
+	router := setupRouter(ctx, log, textService, cfg.DefaultTTL)
 
 	cleaner := cleanup.New(db, blobStorage, cache, log)
 
@@ -89,7 +84,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:         cfg.Address,
-		Handler:      r,
+		Handler:      router,
 		ReadTimeout:  cfg.HTTPServer.Timeout,
 		WriteTimeout: cfg.HTTPServer.Timeout,
 		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
@@ -117,6 +112,18 @@ func main() {
 	}
 
 	log.Info("Main service stopped")
+}
+
+func setupRouter(ctx context.Context, log *slog.Logger, textService *textService.TextOperator, defaultTTL int) *chi.Mux {
+	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	r.Post("/save", save.New(ctx, log, textService, defaultTTL))
+	r.Get("/{hash}", get.New(ctx, log, textService))
+
+	return r
 }
 
 func setupLogger(env string) *slog.Logger {
