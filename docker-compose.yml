@@ -60,6 +60,21 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+  redis:
+    image: redis:7.2.4
+    container_name: pastebin_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "password", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
   hash_gen_service:
     build:
       context: ./hash_generator_service
@@ -86,6 +101,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       hash_gen_service:
         condition: service_started
     volumes:
@@ -95,3 +112,4 @@ volumes:
   kafka_data:
   mysql_data:
   minio_data:
+  redis_data:

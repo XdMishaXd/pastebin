@@ -3,10 +3,10 @@ env: "prod"
 kafka:
   addr: "kafka:9092"
   topic: "hashQueue"
-  batch_size: 15
+  batch_size: 1
   max_attempts: 3
   
 hash:
-  hash_rate: 150
+  hash_rate: 1
   hash_length: 7 # max length - 128 symbols
-  workers: 10
+  workers: 1

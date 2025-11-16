@@ -15,16 +15,22 @@ type FileStorage interface {
 	DeleteFile(ctx context.Context, hash string) error
 }
 
+type Cache interface {
+	DeleteText(ctx context.Context, hash string) error
+}
+
 type Cleaner struct {
 	db    Storage
 	files FileStorage
+	cache Cache
 	log   *slog.Logger
 }
 
-func New(db Storage, files FileStorage, log *slog.Logger) *Cleaner {
+func New(db Storage, files FileStorage, cache Cache, log *slog.Logger) *Cleaner {
 	return &Cleaner{
 		db:    db,
 		files: files,
+		cache: cache,
 		log:   log,
 	}
 }
@@ -65,6 +71,10 @@ func (c *Cleaner) run(ctx context.Context) {
 	}
 
 	for _, hash := range expired {
+		if err := c.cache.DeleteText(ctx, hash); err != nil {
+			c.log.Error("Failed to delete from Redis", slog.String("hash", hash), slog.Any("error", err))
+		}
+
 		if err := c.db.DeleteByHash(ctx, hash); err != nil {
 			c.log.Error("Failed to delete from MySQL", slog.String("hash", hash), slog.Any("error", err))
 			continue

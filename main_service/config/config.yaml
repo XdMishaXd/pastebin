@@ -1,4 +1,4 @@
-env: "prod"
+env: "dev"
 
 default_ttl: 1
 
@@ -13,6 +13,11 @@ kafka:
 
 mysql:
   dsn: "pasteuser:pastepass@tcp(mysql:3306)/pastebin?parseTime=true"
+
+redis:
+  popularity_threshold: 100 # * Сколько должно быть запросов к тексту, чтобы он добавился в redis
+  db: 0
+  addr: "redis:6379"
 
 minio:
   endpoint: "minio:9000"

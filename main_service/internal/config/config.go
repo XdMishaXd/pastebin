@@ -15,6 +15,7 @@ type Config struct {
 	MySQL      `yaml:"mysql"`
 	Kafka      `yaml:"kafka"`
 	MinIO      `yaml:"minio"`
+	Redis      `yaml:"redis"`
 }
 
 type HTTPServer struct {
@@ -38,6 +39,12 @@ type MySQL struct {
 type Kafka struct {
 	Addr  string `yaml:"addr" env-default:"kafka:9092"`
 	Topic string `yaml:"topic" env-required:"true"`
+}
+
+type Redis struct {
+	Addr                string `yaml:"addr" env-default:"redis:6379"`
+	Db                  int    `yaml:"db" env-default:"1"`
+	PopularityThreshold int64  `yaml:"popularity_threshold" env-default:"500"`
 }
 
 func MustLoad(configPath string) *Config {

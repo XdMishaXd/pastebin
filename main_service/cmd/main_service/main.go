@@ -11,6 +11,7 @@ import (
 	cleanup "main_service/internal/scheduler"
 	minioStorage "main_service/internal/storage/minio"
 	"main_service/internal/storage/mysql"
+	"main_service/internal/storage/redis"
 	"net/http"
 	"os"
 	"os/signal"
@@ -64,9 +65,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	cache, err := redis.New(ctx, cfg.Redis.Db, cfg.Redis.Addr)
+	if err != nil {
+		log.Error("failed to connect redis", slog.String("err", err.Error()))
+		os.Exit(1)
+	}
+
 	reader := kafkaReader.New(cfg.Kafka.Addr, cfg.Kafka.Topic)
 
-	textService := textService.New(db, reader, blobStorage)
+	textService := textService.New(db, reader, blobStorage, cache, cfg.Redis.PopularityThreshold)
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -76,7 +83,7 @@ func main() {
 	r.Post("/save", save.New(log, ctx, textService, cfg.DefaultTTL))
 	r.Get("/{hash}", get.New(log, ctx, textService))
 
-	cleaner := cleanup.New(db, blobStorage, log)
+	cleaner := cleanup.New(db, blobStorage, cache, log)
 
 	go cleaner.Start(ctx, 3, 0)
 

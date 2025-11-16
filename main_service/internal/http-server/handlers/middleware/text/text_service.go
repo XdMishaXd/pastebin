@@ -25,17 +25,28 @@ type MinIO interface {
 	ListFiles(ctx context.Context) ([]string, error)
 }
 
-type TextSaverService struct {
-	mysql MySql
-	kafka Kafka
-	minio MinIO
+type Redis interface {
+	Text(ctx context.Context, hash string) (string, error)
+	SaveText(ctx context.Context, hash, text string) error
+	DeleteText(ctx context.Context, hash string) error
+	IncPopularity(ctx context.Context, hash string) (int64, error)
 }
 
-func New(mysql MySql, k Kafka, min MinIO) *TextSaverService {
+type TextSaverService struct {
+	mysql               MySql
+	kafka               Kafka
+	minio               MinIO
+	redis               Redis
+	popularityThreshold int64
+}
+
+func New(mysql MySql, k Kafka, min MinIO, redis Redis, popularityThreshold int64) *TextSaverService {
 	return &TextSaverService{
-		mysql: mysql,
-		kafka: k,
-		minio: min,
+		mysql:               mysql,
+		kafka:               k,
+		minio:               min,
+		redis:               redis,
+		popularityThreshold: popularityThreshold,
 	}
 }
 
@@ -54,11 +65,21 @@ func (s *TextSaverService) SaveText(ctx context.Context, text string, ttl int) (
 }
 
 func (s *TextSaverService) GetText(ctx context.Context, hash string) (string, error) {
+	if txt, _ := s.redis.Text(ctx, hash); txt != "" {
+		_, err := s.redis.IncPopularity(ctx, hash)
+		if err != nil {
+			return "", err
+		}
+
+		return txt, nil
+	}
+
 	_, err := s.mysql.GetByHash(ctx, hash)
 	if err != nil {
 		if errors.Is(err, storage.ErrTextNotFound) {
 			return "", storage.ErrTextNotFound
 		}
+
 		if errors.Is(err, storage.ErrTTLIsExpired) {
 			return "", storage.ErrTTLIsExpired
 		}
@@ -69,6 +90,15 @@ func (s *TextSaverService) GetText(ctx context.Context, hash string) (string, er
 	text, err := s.minio.GetString(ctx, hash)
 	if err != nil {
 		return "", err
+	}
+
+	views, err := s.redis.IncPopularity(ctx, hash)
+	if err != nil {
+		return text, err
+	}
+
+	if views >= s.popularityThreshold {
+		_ = s.redis.SaveText(ctx, hash, text)
 	}
 
 	return text, nil
