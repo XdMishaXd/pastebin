@@ -32,7 +32,7 @@ type Redis interface {
 	IncPopularity(ctx context.Context, hash string) (int64, error)
 }
 
-type TextSaverService struct {
+type TextOperator struct {
 	mysql               MySql
 	kafka               Kafka
 	minio               MinIO
@@ -40,8 +40,8 @@ type TextSaverService struct {
 	popularityThreshold int64
 }
 
-func New(mysql MySql, k Kafka, min MinIO, redis Redis, popularityThreshold int64) *TextSaverService {
-	return &TextSaverService{
+func New(mysql MySql, k Kafka, min MinIO, redis Redis, popularityThreshold int64) *TextOperator {
+	return &TextOperator{
 		mysql:               mysql,
 		kafka:               k,
 		minio:               min,
@@ -50,7 +50,7 @@ func New(mysql MySql, k Kafka, min MinIO, redis Redis, popularityThreshold int64
 	}
 }
 
-func (s *TextSaverService) SaveText(ctx context.Context, text string, ttl int) (string, error) {
+func (s *TextOperator) SaveText(ctx context.Context, text string, ttl int) (string, error) {
 	hash, err := s.kafka.ReadMessage(ctx)
 	if err != nil {
 		return "", err
@@ -64,7 +64,7 @@ func (s *TextSaverService) SaveText(ctx context.Context, text string, ttl int) (
 	return hash, s.mysql.SaveMetadata(ctx, hash, ttl)
 }
 
-func (s *TextSaverService) GetText(ctx context.Context, hash string) (string, error) {
+func (s *TextOperator) GetText(ctx context.Context, hash string) (string, error) {
 	if txt, _ := s.redis.Text(ctx, hash); txt != "" {
 		_, err := s.redis.IncPopularity(ctx, hash)
 		if err != nil {
@@ -104,7 +104,7 @@ func (s *TextSaverService) GetText(ctx context.Context, hash string) (string, er
 	return text, nil
 }
 
-func (s *TextSaverService) DeleteText(ctx context.Context, hash string) error {
+func (s *TextOperator) DeleteText(ctx context.Context, hash string) error {
 	if err := s.mysql.DeleteByHash(ctx, hash); err != nil {
 		return err
 	}
