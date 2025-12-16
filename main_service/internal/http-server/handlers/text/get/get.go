@@ -31,7 +31,8 @@ func New(ctx context.Context, log *slog.Logger, textGetter models.TextOperator) 
 		if hash == "" {
 			log.Info("Hash is empty")
 
-			render.JSON(w, r, resp.Error("not found"))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, resp.Error("Hash is empty"))
 
 			return
 		}
