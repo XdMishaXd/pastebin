@@ -3,10 +3,11 @@ package save
 import (
 	"context"
 	"log/slog"
+	"net/http"
+
 	resp "main_service/internal/lib/api/response"
 	sl "main_service/internal/lib/logger"
 	"main_service/internal/models"
-	"net/http"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -22,6 +23,18 @@ type Response struct {
 	resp.Response
 	Hash string `json:"hash"`
 }
+
+// New godoc
+// @Summary      Сохранить текст
+// @Description  Сохранить текст и получить уникальный хеш для доступа
+// @Tags         texts
+// @Accept       json
+// @Produce      json
+// @Param        request  body      Request  true  "Текст для сохранения"
+// @Success      201      {object}  Response "Успешно сохранено"
+// @Failure      400      {object}  ErrorResponse "Некорректный запрос"
+// @Failure      500      {object}  ErrorResponse "Внутренняя ошибка сервера"
+// @Router       /text/save [post]
 
 func New(ctx context.Context, log *slog.Logger, textSaver models.TextOperator, defaultTTL int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +78,7 @@ func New(ctx context.Context, log *slog.Logger, textSaver models.TextOperator, d
 		if err != nil {
 			log.Error("failed to save text", sl.Err(err))
 
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("Internal error"))
 
 			return
@@ -72,6 +86,7 @@ func New(ctx context.Context, log *slog.Logger, textSaver models.TextOperator, d
 
 		log.Info("Text added", slog.String("hash", hash))
 
+		render.Status(r, http.StatusCreated)
 		ResponseOK(w, r, hash)
 	}
 }

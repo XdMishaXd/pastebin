@@ -3,7 +3,14 @@ package main
 import (
 	"context"
 	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"main_service/internal/config"
+	swaggerAuth "main_service/internal/http-server/handlers/middleware/swagger-auth"
 	textService "main_service/internal/http-server/handlers/middleware/text"
 	"main_service/internal/http-server/handlers/text/get"
 	"main_service/internal/http-server/handlers/text/save"
@@ -12,15 +19,19 @@ import (
 	minioStorage "main_service/internal/storage/minio"
 	"main_service/internal/storage/mysql"
 	"main_service/internal/storage/redis"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "main_service/docs"
 )
+
+// @title           Pastebin API
+// @version         1.0
+// @description     API для сервиса Pastebin
+// @host            localhost:8082
+// @BasePath        /
 
 const (
 	envLocal = "local"
@@ -76,7 +87,7 @@ func main() {
 
 	textService := textService.New(db, reader, blobStorage, cache, cfg.Redis.PopularityThreshold)
 
-	router := setupRouter(ctx, log, textService, cfg.DefaultTTL)
+	router := setupRouter(ctx, log, textService, cfg)
 
 	cleaner := cleanup.New(db, blobStorage, cache, log)
 
@@ -114,14 +125,26 @@ func main() {
 	log.Info("Main service stopped")
 }
 
-func setupRouter(ctx context.Context, log *slog.Logger, textService *textService.TextOperator, defaultTTL int) *chi.Mux {
+func setupRouter(
+	ctx context.Context,
+	log *slog.Logger,
+	textService *textService.TextOperator,
+	cfg *config.Config,
+) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Post("/save", save.New(ctx, log, textService, defaultTTL))
-	r.Get("/{hash}", get.New(ctx, log, textService))
+	if cfg.Swagger.Enabled {
+		r.Group(func(r chi.Router) {
+			r.Use(swaggerAuth.New(cfg.Swagger.Username, cfg.Swagger.Password))
+			r.Get("/swagger/*", httpSwagger.WrapHandler)
+		})
+	}
+
+	r.Post("/text/save", save.New(ctx, log, textService, cfg.DefaultTTL))
+	r.Get("/text/{hash}", get.New(ctx, log, textService))
 
 	return r
 }

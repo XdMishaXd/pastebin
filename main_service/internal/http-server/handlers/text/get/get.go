@@ -3,10 +3,11 @@ package get
 import (
 	"context"
 	"log/slog"
+	"net/http"
+
 	resp "main_service/internal/lib/api/response"
 	sl "main_service/internal/lib/logger"
 	"main_service/internal/models"
-	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -17,6 +18,18 @@ type Response struct {
 	resp.Response
 	Text string `json:"text"`
 }
+
+// New godoc
+// @Summary      Получить текст
+// @Description  Получить сохраненный текст по его уникальному хешу
+// @Tags         texts
+// @Accept       json
+// @Produce      json
+// @Param        hash  string  true  "Уникальный хеш текста" example:"abc123def456"
+// @Success      200   {object}  Response "Текст успешно получен"
+// @Failure      400   {object}  ErrorResponse "Хеш не указан или некорректен"
+// @Failure      500   {object}  ErrorResponse "Внутренняя ошибка сервера"
+// @Router       /text/{hash} [get]
 
 func New(ctx context.Context, log *slog.Logger, textGetter models.TextOperator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +54,7 @@ func New(ctx context.Context, log *slog.Logger, textGetter models.TextOperator) 
 		if err != nil {
 			log.Error("failed to get text", sl.Err(err))
 
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("Failed to get text"))
 
 			return

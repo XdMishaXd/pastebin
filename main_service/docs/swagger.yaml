@@ -1,0 +1,9 @@
+basePath: /
+host: localhost:8082
+info:
+  contact: {}
+  description: API для сервиса Pastebin
+  title: Pastebin API
+  version: "1.0"
+paths: {}
+swagger: "2.0"

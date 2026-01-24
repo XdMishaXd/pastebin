@@ -1,0 +1,104 @@
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# IDE и редакторы
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# * Go специфичные файлы
+# Бинарники
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+build/
+*.test
+*.out
+
+# Vendor (если используете)
+vendor/
+
+# Go workspace
+go.work
+go.work.sum
+
+# Coverage
+*.cover
+*.coverage
+coverage.txt
+coverage.html
+
+# Профилирование
+*.prof
+*.pprof
+
+# Документация и README
+*.md
+!README.md
+LICENSE
+documentation/
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+.jenkins/
+Jenkinsfile
+azure-pipelines.yml
+
+# Docker
+Dockerfile
+Dockerfile.*
+docker-compose*.yml
+.dockerignore
+
+# Kubernetes
+k8s/
+kubernetes/
+*.yaml
+*.yml
+!config/*.yaml
+
+# Terraform / Infrastructure
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+
+# Тесты и моки
+*_test.go
+testdata/
+mocks/
+fixtures/
+
+# Временные файлы
+tmp/
+temp/
+*.tmp
+*.log
+*.cache
+
+# Скрипты разработки
+scripts/
+Makefile
+*.sh
+
+# Environment файлы
+.env
+.env.*
+!.env.example
+
+# Зависимости и кэши
+node_modules/
+.npm/
+.yarn/
