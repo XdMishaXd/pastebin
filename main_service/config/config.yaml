@@ -1,11 +1,16 @@
-env: "dev"
+env: "prod"
 
 default_ttl: 1
 
 http_server:
-  address: "0.0.0.0:8082"
+  address: ":8082"
   timeout: 4s
   idle_timeout: 30s
+
+swagger:
+  username: "admin"
+  password: "admin"
+  enabled: true
 
 kafka:
   addr: "kafka:9092"

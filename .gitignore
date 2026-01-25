@@ -1,1 +1,84 @@
-**Taskfile.yml
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+*.cover
+*.coverage
+coverage.txt
+coverage.html
+*.coverprofile
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# Task / Taskfile
+Taskfile.yml
+Taskfile.yaml
+.task/
+
+# Build output
+bin/
+dist/
+build/
+tmp/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.iml
+.DS_Store
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.envrc
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.pid
+*.bak
+*.backup
+
+# Profiling
+*.prof
+*.pprof
+cpu.prof
+mem.prof
+
+# Task/Make
+.task/
+
+# Air live reload
+.air.toml
+tmp/
+
+# Debug
+debug
+__debug_bin

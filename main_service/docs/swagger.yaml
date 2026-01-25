@@ -1,0 +1,130 @@
+basePath: /
+host: localhost:8082
+info:
+  contact: {}
+  description: API для сервиса Pastebin
+  title: Pastebin API
+  version: "1.0"
+paths:
+  /text/{hash}:
+    get:
+      consumes:
+      - application/json
+      description: Получает сохраненный текст по его уникальному хешу. Популярные
+        тексты кэшируются в Redis для быстрого доступа.
+      parameters:
+      - description: Уникальный хеш текста (буквенно-цифровая строка)
+        example: a1b2c3d4e5f6
+        in: path
+        maxLength: 64
+        minLength: 6
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Текст успешно получен"  example({"status": "ok", "text": "Hello,
+            World!"})'
+          schema:
+            properties:
+              status:
+                type: string
+              text:
+                type: string
+            type: object
+        "400":
+          description: 'Хеш не указан"  example({"status": "error", "error": "Hash
+            is empty"})'
+          schema:
+            properties:
+              error:
+                type: string
+              status:
+                type: string
+            type: object
+        "404":
+          description: 'Текст не найден"  example({"status": "error", "error": "Text
+            not found"})'
+          schema:
+            properties:
+              error:
+                type: string
+              status:
+                type: string
+            type: object
+        "500":
+          description: 'Ошибка при получении текста"  example({"status": "error",
+            "error": "Failed to get text"})'
+          schema:
+            properties:
+              error:
+                type: string
+              status:
+                type: string
+            type: object
+      security:
+      - none: []
+      summary: Получить текст
+      tags:
+      - texts
+      x-order: 2
+  /text/save:
+    post:
+      consumes:
+      - application/json
+      description: Сохраняет текст в хранилище и возвращает уникальный хеш для последующего
+        доступа. Текст хранится с указанным TTL (время жизни).
+      parameters:
+      - description: Данные для сохранения
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            text:
+              type: string
+            ttl:
+              type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 'Текст успешно сохранен"  example({"status": "ok", "hash":
+            "a1b2c3d4e5f6"})'
+          schema:
+            properties:
+              hash:
+                type: string
+              status:
+                type: string
+            type: object
+        "400":
+          description: 'Некорректный запрос"  example({"status": "error", "error":
+            "Text is required"})'
+          schema:
+            properties:
+              error:
+                type: string
+              status:
+                type: string
+            type: object
+        "500":
+          description: 'Внутренняя ошибка сервера"  example({"status": "error", "error":
+            "Failed to save text"})'
+          schema:
+            properties:
+              error:
+                type: string
+              status:
+                type: string
+            type: object
+      security:
+      - none: []
+      summary: Сохранить текст
+      tags:
+      - texts
+      x-order: 1
+swagger: "2.0"
