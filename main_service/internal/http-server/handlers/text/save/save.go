@@ -26,16 +26,17 @@ type Response struct {
 
 // New godoc
 // @Summary      Сохранить текст
-// @Description  Сохранить текст и получить уникальный хеш для доступа
+// @Description  Сохраняет текст в хранилище и возвращает уникальный хеш для последующего доступа. Текст хранится с указанным TTL (время жизни).
 // @Tags         texts
 // @Accept       json
 // @Produce      json
-// @Param        request  body      Request  true  "Текст для сохранения"
-// @Success      201      {object}  Response "Успешно сохранено"
-// @Failure      400      {object}  ErrorResponse "Некорректный запрос"
-// @Failure      500      {object}  ErrorResponse "Внутренняя ошибка сервера"
+// @Param        request  body      object{text=string,ttl=int}  true  "Данные для сохранения"  example({"text": "Hello, World!", "ttl": 3600})
+// @Success      201      {object}  object{status=string,hash=string}  "Текст успешно сохранен"  example({"status": "ok", "hash": "a1b2c3d4e5f6"})
+// @Failure      400      {object}  object{status=string,error=string}  "Некорректный запрос"  example({"status": "error", "error": "Text is required"})
+// @Failure      500      {object}  object{status=string,error=string}  "Внутренняя ошибка сервера"  example({"status": "error", "error": "Failed to save text"})
 // @Router       /text/save [post]
-
+// @Security     none
+// @x-order      1
 func New(ctx context.Context, log *slog.Logger, textSaver models.TextOperator, defaultTTL int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.text.save.New"

@@ -2,12 +2,14 @@ package get
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 
 	resp "main_service/internal/lib/api/response"
 	sl "main_service/internal/lib/logger"
 	"main_service/internal/models"
+	"main_service/internal/storage"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -21,16 +23,18 @@ type Response struct {
 
 // New godoc
 // @Summary      Получить текст
-// @Description  Получить сохраненный текст по его уникальному хешу
+// @Description  Получает сохраненный текст по его уникальному хешу. Популярные тексты кэшируются в Redis для быстрого доступа.
 // @Tags         texts
 // @Accept       json
 // @Produce      json
-// @Param        hash  string  true  "Уникальный хеш текста" example:"abc123def456"
-// @Success      200   {object}  Response "Текст успешно получен"
-// @Failure      400   {object}  ErrorResponse "Хеш не указан или некорректен"
-// @Failure      500   {object}  ErrorResponse "Внутренняя ошибка сервера"
+// @Param        hash  path  string  true  "Уникальный хеш текста (буквенно-цифровая строка)"  minlength(6)  maxlength(64)  example(a1b2c3d4e5f6)
+// @Success      200   {object}  object{status=string,text=string}  "Текст успешно получен"  example({"status": "ok", "text": "Hello, World!"})
+// @Failure      400   {object}  object{status=string,error=string}  "Хеш не указан"  example({"status": "error", "error": "Hash is empty"})
+// @Failure      404   {object}  object{status=string,error=string}  "Текст не найден"  example({"status": "error", "error": "Text not found"})
+// @Failure      500   {object}  object{status=string,error=string}  "Ошибка при получении текста"  example({"status": "error", "error": "Failed to get text"})
 // @Router       /text/{hash} [get]
-
+// @Security     none
+// @x-order      2
 func New(ctx context.Context, log *slog.Logger, textGetter models.TextOperator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.text.get.New"
@@ -54,13 +58,22 @@ func New(ctx context.Context, log *slog.Logger, textGetter models.TextOperator) 
 		if err != nil {
 			log.Error("failed to get text", sl.Err(err))
 
+			if errors.Is(err, storage.ErrTextNotFound) || errors.Is(err, storage.ErrTTLIsExpired) {
+				render.Status(r, http.StatusNotFound)
+				render.JSON(w, r, resp.Error("Text not found"))
+
+				return
+			}
+
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("Failed to get text"))
 
 			return
 		}
 
-		log.Info("Text returned", slog.String("hash", hash))
+		w.Header().Set("Cache-Control", "private, max-age=60")
+
+		log.Info("Text got successfully", slog.String("hash", hash))
 
 		ResponseOK(w, r, text)
 	}

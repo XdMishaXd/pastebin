@@ -24,6 +24,7 @@ func New(username, password string) func(http.Handler) http.Handler {
 				w.Header().Set("WWW-Authenticate", `Basic realm="Swagger Documentation"`)
 				w.WriteHeader(http.StatusUnauthorized)
 				_, _ = w.Write([]byte("Unauthorized"))
+
 				return
 			}
 

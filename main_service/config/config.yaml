@@ -1,4 +1,4 @@
-env: "dev"
+env: "prod"
 
 default_ttl: 1
 

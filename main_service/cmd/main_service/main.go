@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"main_service/internal/config"
-	swaggerAuth "main_service/internal/http-server/handlers/middleware/swagger-auth"
-	textService "main_service/internal/http-server/handlers/middleware/text"
 	"main_service/internal/http-server/handlers/text/get"
 	"main_service/internal/http-server/handlers/text/save"
 	kafkaReader "main_service/internal/kafka"
+	swaggerAuth "main_service/internal/middleware/swagger-auth"
+	textService "main_service/internal/middleware/text"
 	cleanup "main_service/internal/scheduler"
 	minioStorage "main_service/internal/storage/minio"
 	"main_service/internal/storage/mysql"

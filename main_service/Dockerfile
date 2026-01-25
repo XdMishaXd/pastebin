@@ -48,6 +48,6 @@ COPY --from=builder /build/config /app/config
 
 USER appuser
 
-EXPOSE 8080
+EXPOSE 8082
 
 ENTRYPOINT ["./main_service"]

@@ -8,5 +8,181 @@
     },
     "host": "localhost:8082",
     "basePath": "/",
-    "paths": {}
+    "paths": {
+        "/text/save": {
+            "post": {
+                "security": [
+                    {
+                        "none": []
+                    }
+                ],
+                "description": "Сохраняет текст в хранилище и возвращает уникальный хеш для последующего доступа. Текст хранится с указанным TTL (время жизни).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "texts"
+                ],
+                "summary": "Сохранить текст",
+                "parameters": [
+                    {
+                        "description": "Данные для сохранения",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "text": {
+                                    "type": "string"
+                                },
+                                "ttl": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Текст успешно сохранен\"  example({\"status\": \"ok\", \"hash\": \"a1b2c3d4e5f6\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "hash": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный запрос\"  example({\"status\": \"error\", \"error\": \"Text is required\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера\"  example({\"status\": \"error\", \"error\": \"Failed to save text\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-order": 1
+            }
+        },
+        "/text/{hash}": {
+            "get": {
+                "security": [
+                    {
+                        "none": []
+                    }
+                ],
+                "description": "Получает сохраненный текст по его уникальному хешу. Популярные тексты кэшируются в Redis для быстрого доступа.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "texts"
+                ],
+                "summary": "Получить текст",
+                "parameters": [
+                    {
+                        "maxLength": 64,
+                        "minLength": 6,
+                        "type": "string",
+                        "example": "a1b2c3d4e5f6",
+                        "description": "Уникальный хеш текста (буквенно-цифровая строка)",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Текст успешно получен\"  example({\"status\": \"ok\", \"text\": \"Hello, World!\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                },
+                                "text": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Хеш не указан\"  example({\"status\": \"error\", \"error\": \"Hash is empty\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Текст не найден\"  example({\"status\": \"error\", \"error\": \"Text not found\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка при получении текста\"  example({\"status\": \"error\", \"error\": \"Failed to get text\"})",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-order": 2
+            }
+        }
+    }
 }
